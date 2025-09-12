@@ -26,7 +26,7 @@ class DependencyAnalysisTool(BaseTool):
                     return "\n".join(found_dependancies)
                 
     
-    def create_repo_analysis_agent(llm,retriever):
+    def create_repo_analysis_agents(llm,retriever):
         """
         Creates and returns the specialized agents for the repository analysis
         """
