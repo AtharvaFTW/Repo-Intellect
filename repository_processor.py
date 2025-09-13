@@ -28,10 +28,10 @@ def clone_github_repo(repo_url:str , local_path:str="temp_rep")->str:
         for root,dirs,files in os.walk(local_path):
             for name in files:
                 filename=os.path.join(root,name)
-                os.chmod(filename,stat.S_IWUSR)
+                os.chmod(filename,stat.S_IRUSR | stat.S_IWUSR)
             for name in dirs:
                 dirname=os.path.join(root,name)
-                os.chomod(dirname,stat.S_IWUSR)
+                os.chmod(dirname,stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
         
         shutil.rmtree(local_path)
     
