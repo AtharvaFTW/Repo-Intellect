@@ -44,7 +44,7 @@ class RepoAnalysisCrew:
             agents=list(self.agents.values()),
             tasks=[summary_task,dependency_task,security_task,documentation_task],
             process=Process.sequential,
-            verbose=2
+            verbose=True
         )
 
         print("Kicking off Repo-Intellect crew...")

@@ -1,13 +1,14 @@
 import os
+from typing import Any
 from crewai import Agent
 from crewai.tools import BaseTool
 from llm_setup import get_llm
 
 class DependencyAnalysisTool(BaseTool):
     name:str="Dependency Anaylsis Tool"
-    description:str="Parses common dependency files like requirements.txt or package.json to a list of project dependencies."
+    description:str=("Parses common dependency files like requirements.txt or package.json to a list of project dependencies.")
 
-    def run(self,directory:str)->str:
+    def _run(self,directory:str)->str:
         dependency_files= {
             "requirements.txt":"Python (pip)",
             "package.json":"Node.js(npm)"
@@ -21,25 +22,31 @@ class DependencyAnalysisTool(BaseTool):
                 with open(filepath,"r") as f:
                     content=f.read()
                     found_dependancies.append(f"---{ecosystem}Dependancies({filename})--- \n{content}\n")
-                    if not found_dependancies:
-                        return "No common dependency files (e.g., requirements.txt, package.json) found"
-                    return "\n".join(found_dependancies)
-                
-    
+        if not found_dependancies:
+            return "No common dependency files (e.g., requirements.txt, package.json) found"
+        return "\n".join(found_dependancies)
+
+
+
 def create_repo_analysis_agents(llm,retriever):
     """
     Creates and returns the specialized agents for the repository analysis
     """
-    retrieval_tool=BaseTool(
-        name="Repository Code Search",
-        description="Searches the repository's codebase to fine relevant code snippets based on a query.",
-        func=lambda q:retriever.invoke(q))
-
+    class RepositorySearchTool(BaseTool):
+        name:str = "Repository Code Search"
+        description:str = "Searches the repository's codebase to find relevant codes snippets based on the query"
+        retriever: any
+        def _run(self,query: str) -> str:
+            docs= self.retriever.get_relevant_documents(query)
+            if not docs:
+                return "No relevant code snippets found."
+            return "\n\n---\n\n".join(d.page_content for d in docs[:3])
+    retrieval_tool=RepositorySearchTool(retriever=retriever)
     dependency_tool=DependencyAnalysisTool()
 
     code_summarizer=Agent(
         role="Principal Code Summarizer",
-        goal="Generate a high-level summary of the repository's purpose, architecture, and key components,",
+        goal="Generate a high-level summary of the repository's purpose, architecture, and key components.",
         backstory=("""
             You are an expert software architect with years of experience in analyzing large codebases.
             Your task is to provide a clear and concise overview that helps developers quickly underand the project."""),
@@ -57,6 +64,7 @@ def create_repo_analysis_agents(llm,retriever):
             verbose=True,
             llm=llm,
             tools=[dependency_tool],
+            max_iter=3,
             allow_delegation=False)
     
     security_auditor=Agent(

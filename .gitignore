@@ -1,9 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+chroma_db/
 *.py[codz]
 *$py.class
 temp_rep/
-chroma_db/
 
 # C extensions
 *.so
@@ -27,6 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+test.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

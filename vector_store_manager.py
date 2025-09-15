@@ -1,12 +1,14 @@
 import chromadb
-from langchain.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_community.embeddings import OllamaEmbeddings
+import os
 
 class VectorStoreManager:
     def __init__(self,collection_name="repo_intellect_store"):
-        self.client=chromadb.Client()
+        self.client=chromadb.PersistentClient("./chroma_db")
         self.collection_name= collection_name
-        self.embedding_function=OllamaEmbeddings(model="mistral")
+        self.embedding_function=OllamaEmbeddings(
+            model=os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text"))
         self.vector_store=self.get_or_create_vector_store()
 
     def get_or_create_vector_store(self):
@@ -17,7 +19,7 @@ class VectorStoreManager:
         print(f"Initializing vector store with collection:{self.collection_name}")
         return Chroma(client=self.client,
                       collection_name=self.collection_name,
-                      embedding_function=self.embedding_function
+                      embedding_function=self.embedding_function,
                       )
     
     def populate_vector_store(self, documents:list):
