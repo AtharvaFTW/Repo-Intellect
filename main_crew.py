@@ -34,7 +34,8 @@ class RepoAnalysisCrew:
 
         documentation_task= Task(
             description=f"""Combine the findings from the code summary, dependency analysis, and security audit
-            into a single, comprehensive report. The report should be well-structured in Markdown format.""",
+            into a single, comprehensive report. The report should be well-structured in Markdown format.
+            The report must be valid **plain markdown** and **MUST NOT** be wrapped in triple backticks or any code fences""",
             expected_output="A final, comprehensive report in Markdown format, with sections for Summary, Dependencies and Security Analysis.",
             agent=self.agents["documentation_generator"],
             context=[summary_task,dependency_task,security_task]

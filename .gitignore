@@ -4,6 +4,8 @@ chroma_db/
 *.py[codz]
 *$py.class
 temp_rep/
+chroma/
+temp_rep/
 
 # C extensions
 *.so
@@ -208,3 +210,5 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+to-do.txt
+to-do.md

@@ -6,6 +6,21 @@ from main_crew import RepoAnalysisCrew
 st.set_page_config(page_title="Repo-Intellect",layout="wide")
 st.title("🧠 Repo-Intellect: AI GitHub Repository Analysis Agent")
 
+def _strip_md_fences(text: str) -> str:
+    """Remove surrounding ``` or ```markdown fences if present."""
+    if not text:
+        return text
+    s = text.strip()
+    if s.startswith("```"):
+        # drop the first fence line (``` or ```markdown)
+        nl = s.find("\n")
+        if nl != -1:
+            s = s[nl+1:]
+        # drop trailing fence
+        if s.endswith("```"):
+            s = s[:-3]
+    return s.strip()
+
 st.sidebar.header("Instructions")
 st.sidebar.info("""
             1.Enter a public GitHub repository URL.\n
@@ -27,7 +42,7 @@ if st.button("Analyze Repository"):
         try:
             with st.spinner("Step 1/4: Cloning the shared repository."):
                 repo_path=clone_github_repo(repo_url=repo_url)
-                st.success("Repository clone successfully!")
+                st.success("Repository cloned successfully!")
 
             with st.spinner("Step 2/4: Processing and chunking files..."):
                 documents=load_and_chunk(repo_path)
@@ -41,12 +56,22 @@ if st.button("Analyze Repository"):
                 st.success("Vector store created!")
             
             with st.spinner("Step 4/4: The AI crew is analyzing the repository. This may take a while."):
-                analysis_crew=RepoAnalysisCrew(retriever=retreiver)
-                result= analysis_crew.run(repo_path=repo_path, user_query=user_query)
+                analysis_crew = RepoAnalysisCrew(retriever=retreiver)
+                result = analysis_crew.run(repo_path=repo_path, user_query=user_query)
                 st.success("Analysis Complete!")
-            
-            st.header("Anaysis Report")
-            st.markdown(result)
+
+            st.header("Analysis Report")
+            # Convert CrewOutput to string if needed
+            if isinstance(result, str):
+                md = result
+            else:
+                md = (
+                    getattr(result, "raw", None)
+                    or getattr(result, "final_output", None)
+                    or getattr(result, "output", None)
+                    or str(result)
+                )
+            st.markdown(md)
 
         except Exception as e:
             st.error(f"An error occured: {e}")
