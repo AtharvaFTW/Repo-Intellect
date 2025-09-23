@@ -60,7 +60,6 @@ if st.button("Analyze Repository"):
                 result = analysis_crew.run(repo_path=repo_path, user_query=user_query)
                 st.success("Analysis Complete!")
 
-            st.header("Analysis Report")
             # Convert CrewOutput to string if needed
             if isinstance(result, str):
                 md = result

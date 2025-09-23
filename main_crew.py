@@ -21,7 +21,7 @@ class RepoAnalysisCrew:
         
         dependency_task=Task(
             description=f"Analyze the depenency files in the repository at '{repo_path}'.",
-            expected_output="A list of all the project dependencies, categorized by ecosystem (e.g., Python, Node.js).",
+            expected_output="A list of all the project dependencies, categorized by ecosystem (e.g., Python, Node.js). Only mention 5-10 important onces and avoid showing all of them.",
             agent=self.agents["dependency_analyst"])
         
         security_task= Task(
